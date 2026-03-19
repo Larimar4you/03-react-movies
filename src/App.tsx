@@ -1,4 +1,4 @@
-import "./App.css";
+import styles from "./App.module.css";
 import SearchBar from "./components/SearchBar/SearchBar";
 import MovieGrid from "./components/MovieGrid/MovieGrid";
 import Loader from "./components/Loader/Loader";
@@ -8,14 +8,20 @@ import type { Movie } from "./types/movie";
 import { useState } from "react";
 
 function App() {
+  const [error, setError] = useState(false);
+
   return (
-    <>
+    <div className={styles.app}>
       <SearchBar />
-      <MovieGrid />
+
+      {error ? (
+        <ErrorMessage message="There was an error, please try again..." />
+      ) : (
+        <MovieGrid />
+      )}
       <Loader />
-      <ErrorMessage />
       <MovieModal />
-    </>
+    </div>
   );
 }
 
