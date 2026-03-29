@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styles from "./App.module.css";
 import SearchBar from "./components/SearchBar/SearchBar";
 import MovieGrid from "./components/MovieGrid/MovieGrid";
@@ -5,24 +6,60 @@ import Loader from "./components/Loader/Loader";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import MovieModal from "./components/MovieModal/MovieModal";
 import type { Movie } from "./types/movie";
-import { useState } from "react";
+import { searchMovies } from "./services/movieService";
 
-function App() {
-  const [error, setError] = useState(false);
+export default function App() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+
+  const handleSearch = async (query: string): Promise<void> => {
+    try {
+      setLoading(true);
+      setError(false);
+      setSelectedMovie(null);
+
+      const data = await searchMovies(query);
+
+      setMovies(data);
+
+      if (data.length === 0) {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+      setMovies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectMovie = (movie: Movie): void => {
+    setSelectedMovie(movie);
+  };
+
+  const handleCloseModal = (): void => {
+    setSelectedMovie(null);
+  };
 
   return (
     <div className={styles.app}>
-      <SearchBar />
+      <SearchBar onSubmit={handleSearch} />
 
-      {error ? (
+      {loading && <Loader />}
+
+      {error && (
         <ErrorMessage message="There was an error, please try again..." />
-      ) : (
-        <MovieGrid />
       )}
-      <Loader />
-      <MovieModal />
+
+      {!loading && !error && movies.length > 0 && (
+        <MovieGrid movies={movies} onSelect={handleSelectMovie} />
+      )}
+
+      {selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
+      )}
     </div>
   );
 }
-
-export default App;

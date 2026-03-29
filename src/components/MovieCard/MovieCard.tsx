@@ -1,5 +1,3 @@
-interface MovieCardProps {...}
-
-export default function MovieCard {
-    
+export default function MovieCard() {
+  return null;
 }
