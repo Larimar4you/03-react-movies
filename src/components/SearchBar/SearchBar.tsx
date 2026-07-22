@@ -12,7 +12,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
       typeof queryValue === "string" ? queryValue.trim() : "";
 
     if (!trimmedQuery) {
-      toast.error("Please enter a search term.");
+      toast.error("Please enter your search query.");
       return;
     }
 

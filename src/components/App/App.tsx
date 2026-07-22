@@ -6,7 +6,8 @@ import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 import type { Movie } from "../../types/movie";
-import { searchMovies } from "../../services/movieService";
+import { toast } from "react-hot-toast";
+import { fetchMovies } from "../../services/movieService";
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -15,21 +16,22 @@ export default function App() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const handleSearch = async (query: string): Promise<void> => {
+    setMovies([]);
+    setError(false);
+    setSelectedMovie(null);
+    setLoading(true);
+
     try {
-      setLoading(true);
-      setError(false);
-      setSelectedMovie(null);
-
-      const data = await searchMovies(query);
-
-      setMovies(data);
+      const data = await fetchMovies(query);
 
       if (data.length === 0) {
-        setError(true);
+        toast.error("No movies found for your request.");
+        return;
       }
+
+      setMovies(data);
     } catch {
       setError(true);
-      setMovies([]);
     } finally {
       setLoading(false);
     }
@@ -49,9 +51,7 @@ export default function App() {
 
       {loading && <Loader />}
 
-      {error && (
-        <ErrorMessage message="There was an error, please try again..." />
-      )}
+      {error && <ErrorMessage />}
 
       {!loading && !error && movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={handleSelectMovie} />
