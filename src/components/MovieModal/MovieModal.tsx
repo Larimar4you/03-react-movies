@@ -31,7 +31,6 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
     };
   }, [onClose]);
 
-  // клик по backdrop
   const handleBackdropClick = (event: MouseEvent<HTMLDivElement>): void => {
     if (event.currentTarget === event.target) {
       onClose();
